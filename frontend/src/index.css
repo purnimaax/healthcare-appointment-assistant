@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    font-family: theme("fontFamily.body");
+    font-feature-settings: "ss01", "ss02", "cv11";
+    -webkit-font-smoothing: antialiased;
+    /* Subtle paper-grain background — adds atmosphere without noise */
+    background-image:
+      radial-gradient(at 12% 8%, rgba(122, 144, 121, 0.06) 0px, transparent 50%),
+      radial-gradient(at 88% 92%, rgba(201, 122, 94, 0.04) 0px, transparent 55%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4 {
+    font-family: theme("fontFamily.display");
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  /* Animated "running" stripe for in-flight tool calls */
+  .stripe-running {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(77, 107, 79, 0.18) 0px,
+      rgba(77, 107, 79, 0.18) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+    background-size: 40px 100%;
+    animation: stripe 1.2s linear infinite;
+  }
+  /* Hide scrollbars but keep functionality */
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: theme("colors.paper.300");
+    border-radius: 4px;
+  }
+}

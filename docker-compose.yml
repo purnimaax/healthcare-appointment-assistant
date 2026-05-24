@@ -1,0 +1,43 @@
+# One-command local setup: `GOOGLE_API_KEY=... docker compose up --build`
+#
+# Backend:  http://localhost:8000  (Swagger at /docs)
+# Frontend: http://localhost:5173  (nginx proxies /api → backend)
+
+services:
+  backend:
+    build: ./backend
+    container_name: mykare-backend
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:?Set GOOGLE_API_KEY in your shell or .env file}
+      ALLOWED_ORIGINS: "http://localhost:5173,http://localhost"
+      APP_ENV: production
+      LOG_LEVEL: INFO
+    volumes:
+      # Persist DB + Chroma + uploads outside the container so data survives
+      # `docker compose down` and rebuilds.
+      - backend_data:/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/\")'"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Empty → frontend uses relative /api URLs, nginx proxies to backend.
+        # This is what you want for docker-compose.
+        VITE_API_BASE_URL: ""
+    container_name: mykare-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend_data:
