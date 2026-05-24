@@ -30,7 +30,7 @@ class RAGService:
             path=settings.CHROMA_PERSIST_DIR,
             settings=ChromaSettings(anonymized_telemetry=False),
         )
-        self._embeddings_obj: Optional[SentenceTransformerEmbeddings] = None
+        self._embeddings_obj: Optional[SentenceTransformerEmbeddingFunction] = None
         self._splitter = RecursiveCharacterTextSplitter(
             chunk_size=800, chunk_overlap=120,
             separators=["\n\n", "\n", ". ", " ", ""],
