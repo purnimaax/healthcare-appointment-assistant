@@ -39,10 +39,11 @@ class RAGService:
         self._user_docs = self._client.get_or_create_collection(_UPLOADS)
 
     @property
-    def _embeddings(self) -> SentenceTransformerEmbeddings:
+    def _embeddings(self):
         if self._embeddings_obj is None:
-            # loaded on first use so startup stays fast
-            self._embeddings_obj = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+            self._embeddings_obj = SentenceTransformerEmbeddingFunction(
+                model_name="all-MiniLM-L6-v2"
+            )
         return self._embeddings_obj
 
     @staticmethod
@@ -50,7 +51,7 @@ class RAGService:
         return f"{prefix}-{hashlib.md5(text.encode()).hexdigest()[:12]}"
 
     def _embed(self, texts: list[str]) -> list[list[float]]:
-        return self._embeddings.embed_documents(texts)
+        return self._embeddings(texts)
 
     def ingest_kb(self, kb_dir: Optional[str] = None) -> int:
         kb_path = Path(kb_dir or settings.KB_DIR)
@@ -92,7 +93,7 @@ class RAGService:
         return len(chunks)
 
     def search(self, query: str, *, k: int = 4, session_id: Optional[str] = None) -> list[dict]:
-        q_emb = self._embeddings.embed_query(query)
+        q_emb = self._embeddings([query])[0]
         results = self._flatten(self._kb.query(query_embeddings=[q_emb], n_results=k))
         if session_id:
             results += self._flatten(self._user_docs.query(
