@@ -12,7 +12,7 @@ from typing import Optional
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from langchain_community.embeddings import SentenceTransformerEmbeddings
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.core.config import settings
